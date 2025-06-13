@@ -21,11 +21,9 @@ const dataSchema = new mongoose_1.Schema({
     specialization: {
         type: mongoose_1.Schema.Types.ObjectId, // e.g., "Cardiology", "Neurology"
         ref: "Specialization",
-        //   required: true,
     },
     experience: {
         type: Number, // in years
-        //   required: true,
     },
     profile_url: {
         type: String, // URL to the doctor's profile page
@@ -60,13 +58,59 @@ const dataSchema = new mongoose_1.Schema({
     ],
     workSchedule: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "WorkSchedule", // Reference to the WorkSchedule model
-        // required: true,
+        ref: "WorkSchedule",
     },
     weekends: {
-        type: [Number], // Array of strings representing weekend days, e.g., [0, 6] for Sunday and Saturday
-        default: [0, 6], // Default to an empty array
-        required: true, // Ensure weekends are always defined
+        type: [Number], // Array of numbers representing weekend days, e.g., [0, 6] for Sunday and Saturday
+        default: [0, 6], // Default to Sunday and Saturday
+        required: true,
+    },
+    stripeCustomerId: {
+        type: String,
+    },
+    subscription: {
+        status: {
+            type: String,
+            enum: ["trialing", "active", "cancelled", "expired"],
+            default: "trialing",
+        },
+        trialStart: {
+            type: Date,
+            default: null,
+        },
+        trialEnd: {
+            type: Date,
+            default: null,
+        },
+        periodStart: {
+            type: Date,
+            default: null, // Start of the paid subscription period
+        },
+        periodEnd: {
+            type: Date,
+            default: null, // End of the paid subscription period
+        },
+        currentPeriodEnd: {
+            type: Date,
+        },
+        planId: {
+            type: String,
+        },
+        stripeSubscriptionId: {
+            type: String,
+        },
+        checkoutSessionId: {
+            type: String,
+        },
+        amount: {
+            type: Number,
+        },
+        currency: {
+            type: String,
+        },
+        created: {
+            type: Date,
+        },
     },
 }, { timestamps: true } // Automatically add createdAt and updatedAt
 );

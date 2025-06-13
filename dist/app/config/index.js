@@ -11,4 +11,8 @@ exports.default = {
     database_url: process.env.MONGO_URI,
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUND,
     node_env: process.env.NODE_ENV,
+    stripe_sk_key_test: process.env.STRIPE_SECRET_KEY,
+    trail_days: parseInt(process.env.TRIAL_DAYS || "15"),
+    stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+    local_base_frontend_url: process.env.LOCAL_BASE_URL,
 };

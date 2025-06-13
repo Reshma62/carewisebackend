@@ -51,6 +51,6 @@ dataSchema.pre("save", async function (next) {
   next();
 });
 
-const User = model("User", dataSchema);
+const User = model<IUser>("User", dataSchema);
 
 export default User;
