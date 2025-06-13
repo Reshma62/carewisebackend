@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateController = void 0;
+exports.LoginController = exports.CreateController = void 0;
 const SendResponse_1 = __importDefault(require("../../utils/SendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const user_service_1 = require("./user.service");
@@ -32,3 +32,20 @@ const CreateController = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.CreateController = CreateController;
+// User login
+const LoginController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        const result = yield (0, user_service_1.loginService)(email);
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: " User logged in successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.LoginController = LoginController;

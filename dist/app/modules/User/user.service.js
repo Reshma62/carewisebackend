@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertIntoDbService = void 0;
+exports.loginService = exports.insertIntoDbService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("./user.model"));
 const doctor_model_1 = __importDefault(require("../Doctor/doctor.model"));
+const patient_model_1 = __importDefault(require("../Patient/patient.model"));
 const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
@@ -24,9 +25,6 @@ const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, funct
         const existingUser = yield user_model_1.default.findOne({ email: payload.email }).session(session);
         if (existingUser && !existingUser.isDeleted) {
             throw new Error("User with this email already exists.");
-        }
-        if (existingUser === null || existingUser === void 0 ? void 0 : existingUser.isDeleted) {
-            throw new Error("User with this email already exists but is deleted. Please restore the user first.");
         }
         // Create new user
         // Create user
@@ -38,11 +36,13 @@ const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, funct
         }
         else if (createdUser.role === "PATIENT") {
             console.log("patient profile creation logic here");
-            //await PatientProfile.create([{ userId: createdUser._id }], { session });
+            yield patient_model_1.default.create([{ userId: createdUser._id }], { session });
         }
         yield session.commitTransaction();
         session.endSession();
-        return createdUser;
+        const userToSend = createdUser.toJSON();
+        userToSend === null || userToSend === void 0 ? true : delete userToSend.password;
+        return userToSend;
     }
     catch (error) {
         yield session.abortTransaction();
@@ -51,3 +51,9 @@ const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.insertIntoDbService = insertIntoDbService;
+// Get from db single user
+const loginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.default.findOne({ email: email }).select("+password");
+    return result;
+});
+exports.loginService = loginService;

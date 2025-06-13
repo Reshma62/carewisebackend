@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Backend service for doctor booking application",
   "license": "ISC",
-
   "scripts": {
     "start": "node ./dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "http-status": "^2.1.0",
@@ -18,6 +18,7 @@
     "zod": "^3.25.64"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.1",
     "ts-node": "^10.9.2",

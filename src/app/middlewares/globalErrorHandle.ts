@@ -9,16 +9,7 @@ import castErrorHandle from "../modules/errors/hadleCastError";
 import handleDuplicateError from "../modules/errors/handleDuplicateError";
 import AppError from "../modules/errors/AppError";
 
-// type TErrorSrc = {
-//   path: string | number;
-//   message: string;
-// }[];
-// let errorSources: TErrorSrc = [
-//   {
-//     path: "",
-//     message: "something went wrong",
-//   },
-// ];
+
 const globalErrorHandle: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
   let message = err.message || "something went wrong";

@@ -15,15 +15,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "";
+const config_1 = __importDefault(require("./app/config"));
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield mongoose_1.default.connect(MONGO_URI);
+            yield mongoose_1.default.connect(config_1.default.database_url);
             console.log("✅ MongoDB connected");
-            app_1.default.listen(PORT, () => {
-                console.log(`🚀 Server running at http://localhost:${PORT}`);
+            app_1.default.listen(config_1.default.port, () => {
+                console.log(`🚀 Server running at http://localhost:${config_1.default.port}`);
             });
         }
         catch (error) {
