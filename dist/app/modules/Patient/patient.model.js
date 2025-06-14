@@ -2,12 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const dataSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-    },
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "User",
+    },
+    name: {
+        type: String,
+    },
+    image: {
+        type: String,
+    },
+    phone: {
+        type: String,
+    },
+    address: {
+        type: String,
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false,
     },
 }, { timestamps: true } // Automatically add createdAt and updatedAt
 );
