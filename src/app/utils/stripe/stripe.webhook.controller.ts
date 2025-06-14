@@ -1,9 +1,7 @@
 import httpStatus from "http-status";
-import { Request, RequestHandler, Response } from "express";
+import { RequestHandler } from "express";
 
-import Doctor from "../../modules/Doctor/doctor.model";
-import stripe from "./stripe";
-import config from "../../config";
+
 import sendResponse from "../SendResponse";
 import { handleCheckoutStripe, handleStripeWebhook } from "./stripe.service";
 

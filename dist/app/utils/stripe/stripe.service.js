@@ -75,7 +75,7 @@ function getPeriodEnd(billingCycleAnchor, interval, intervalCount) {
     return periodEnd;
 }
 const handleStripeWebhook = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     const sig = req.headers["stripe-signature"];
     let event;
     try {
@@ -95,31 +95,41 @@ const handleStripeWebhook = (req) => __awaiter(void 0, void 0, void 0, function*
                         console.error("❌ Missing metadata.customerId");
                         break;
                     }
-                    // Fetch full subscription from Stripe
                     const subscription = yield stripe_1.default.subscriptions.retrieve(data.subscription);
-                    // Calculate period start and end
+                    // Calculate base period start and end from Stripe
                     const periodStart = toDate(subscription.start_date);
-                    const periodEnd = getPeriodEnd(subscription.billing_cycle_anchor, (_b = subscription.plan) === null || _b === void 0 ? void 0 : _b.interval, (_c = subscription.plan) === null || _c === void 0 ? void 0 : _c.interval_count);
-                    console.log("🔄 Stripe Subscription:", {
-                        subscriptionId: data.subscription,
-                        customerId,
-                        periodStart,
-                        periodEnd,
+                    const basePeriodEnd = getPeriodEnd(subscription.billing_cycle_anchor, (_b = subscription.plan) === null || _b === void 0 ? void 0 : _b.interval, (_c = subscription.plan) === null || _c === void 0 ? void 0 : _c.interval_count);
+                    let extendedPeriodEnd = basePeriodEnd;
+                    // Fetch the doctor to check if previous subscription still has time left
+                    const existingDoctor = yield doctor_model_1.default.findOne({
+                        stripeCustomerId: customerId,
                     });
+                    if ((_d = existingDoctor === null || existingDoctor === void 0 ? void 0 : existingDoctor.subscription) === null || _d === void 0 ? void 0 : _d.periodEnd) {
+                        const now = new Date();
+                        const prevPeriodEnd = new Date(existingDoctor.subscription.periodEnd);
+                        if (prevPeriodEnd > now) {
+                            const remainingDays = Math.ceil((prevPeriodEnd.getTime() - now.getTime()) /
+                                (1000 * 60 * 60 * 24));
+                            // Extend the base period end by remaining days
+                            extendedPeriodEnd = new Date(basePeriodEnd);
+                            extendedPeriodEnd.setDate(extendedPeriodEnd.getDate() + remainingDays);
+                            console.log(`📆 Adding ${remainingDays} leftover days to new subscription.`);
+                        }
+                    }
                     const updatedDoctor = yield doctor_model_1.default.findOneAndUpdate({ stripeCustomerId: customerId }, {
                         $set: {
                             "subscription.status": data.payment_status === "paid" ? "active" : "pending",
                             "subscription.stripeSubscriptionId": data.subscription,
                             "subscription.checkoutSessionId": data.id,
-                            "subscription.planId": ((_d = data.metadata) === null || _d === void 0 ? void 0 : _d.planId) || null,
+                            "subscription.planId": ((_e = data.metadata) === null || _e === void 0 ? void 0 : _e.planId) || null,
                             "subscription.amount": data.amount_total,
                             "subscription.currency": data.currency,
                             "subscription.created": toDate(data.created),
                             "subscription.trialStart": null,
                             "subscription.trialEnd": null,
                             "subscription.periodStart": periodStart,
-                            "subscription.periodEnd": periodEnd,
-                            "subscription.currentPeriodEnd": periodEnd,
+                            "subscription.periodEnd": extendedPeriodEnd,
+                            "subscription.currentPeriodEnd": extendedPeriodEnd,
                         },
                     }, { new: true, upsert: false });
                     if (!updatedDoctor) {
@@ -137,10 +147,10 @@ const handleStripeWebhook = (req) => __awaiter(void 0, void 0, void 0, function*
                     // subscription object in data
                     const subscription = data;
                     const periodStart = toDate(subscription.start_date);
-                    const periodEnd = getPeriodEnd(subscription.billing_cycle_anchor, (_e = subscription.plan) === null || _e === void 0 ? void 0 : _e.interval, (_f = subscription.plan) === null || _f === void 0 ? void 0 : _f.interval_count);
+                    const periodEnd = getPeriodEnd(subscription.billing_cycle_anchor, (_f = subscription.plan) === null || _f === void 0 ? void 0 : _f.interval, (_g = subscription.plan) === null || _g === void 0 ? void 0 : _g.interval_count);
                     yield doctor_model_1.default.findOneAndUpdate({ stripeCustomerId: subscription.customer }, {
-                        $set: Object.assign(Object.assign({ "subscription.status": subscription.status, "subscription.periodStart": periodStart, "subscription.periodEnd": periodEnd, "subscription.currentPeriodEnd": periodEnd, "subscription.planId": ((_g = subscription.plan) === null || _g === void 0 ? void 0 : _g.id) ||
-                                ((_k = (_j = (_h = subscription.items) === null || _h === void 0 ? void 0 : _h.data[0]) === null || _j === void 0 ? void 0 : _j.price) === null || _k === void 0 ? void 0 : _k.id) ||
+                        $set: Object.assign(Object.assign({ "subscription.status": subscription.status, "subscription.periodStart": periodStart, "subscription.periodEnd": periodEnd, "subscription.currentPeriodEnd": periodEnd, "subscription.planId": ((_h = subscription.plan) === null || _h === void 0 ? void 0 : _h.id) ||
+                                ((_l = (_k = (_j = subscription.items) === null || _j === void 0 ? void 0 : _j.data[0]) === null || _k === void 0 ? void 0 : _k.price) === null || _l === void 0 ? void 0 : _l.id) ||
                                 null, "subscription.stripeSubscriptionId": subscription.id }, (subscription.status === "trialing" && {
                             "subscription.trialStart": toDate(subscription.trial_start),
                             "subscription.trialEnd": toDate(subscription.trial_end),

@@ -98,31 +98,53 @@ export const handleStripeWebhook = async (req: any) => {
       case "checkout.session.completed":
         if (data.mode === "subscription") {
           const customerId = data?.metadata?.customerId;
-
           if (!customerId) {
             console.error("❌ Missing metadata.customerId");
             break;
           }
 
-          // Fetch full subscription from Stripe
           const subscription = await stripe.subscriptions.retrieve(
             data.subscription
           );
 
-          // Calculate period start and end
+          // Calculate base period start and end from Stripe
           const periodStart = toDate(subscription.start_date);
-          const periodEnd = getPeriodEnd(
+          const basePeriodEnd = getPeriodEnd(
             subscription.billing_cycle_anchor,
             subscription.plan?.interval,
             subscription.plan?.interval_count
           );
 
-          console.log("🔄 Stripe Subscription:", {
-            subscriptionId: data.subscription,
-            customerId,
-            periodStart,
-            periodEnd,
+          let extendedPeriodEnd = basePeriodEnd;
+
+          // Fetch the doctor to check if previous subscription still has time left
+          const existingDoctor = await Doctor.findOne({
+            stripeCustomerId: customerId,
           });
+
+          if (existingDoctor?.subscription?.periodEnd) {
+            const now = new Date();
+            const prevPeriodEnd = new Date(
+              existingDoctor.subscription.periodEnd
+            );
+
+            if (prevPeriodEnd > now) {
+              const remainingDays = Math.ceil(
+                (prevPeriodEnd.getTime() - now.getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+
+              // Extend the base period end by remaining days
+              extendedPeriodEnd = new Date(basePeriodEnd);
+              extendedPeriodEnd.setDate(
+                extendedPeriodEnd.getDate() + remainingDays
+              );
+
+              console.log(
+                `📆 Adding ${remainingDays} leftover days to new subscription.`
+              );
+            }
+          }
 
           const updatedDoctor = await Doctor.findOneAndUpdate(
             { stripeCustomerId: customerId },
@@ -139,8 +161,8 @@ export const handleStripeWebhook = async (req: any) => {
                 "subscription.trialStart": null,
                 "subscription.trialEnd": null,
                 "subscription.periodStart": periodStart,
-                "subscription.periodEnd": periodEnd,
-                "subscription.currentPeriodEnd": periodEnd,
+                "subscription.periodEnd": extendedPeriodEnd,
+                "subscription.currentPeriodEnd": extendedPeriodEnd,
               },
             },
             { new: true, upsert: false }
@@ -152,6 +174,7 @@ export const handleStripeWebhook = async (req: any) => {
             console.log(`✅ Checkout updated Doctor ID: ${updatedDoctor._id}`);
           }
         }
+          
         break;
 
       case "customer.subscription.created":
