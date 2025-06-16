@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginService = exports.insertIntoDbService = void 0;
+exports.insertIntoDbService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = __importDefault(require("./user.model"));
 const doctor_model_1 = __importDefault(require("../Doctor/doctor.model"));
@@ -70,8 +70,3 @@ const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.insertIntoDbService = insertIntoDbService;
 // Get from db single user
-const loginService = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.default.findOne({ email: email }).select("+password");
-    return result;
-});
-exports.loginService = loginService;

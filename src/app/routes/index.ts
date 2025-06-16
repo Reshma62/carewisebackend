@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UserRoutes } from "../modules/User/user.route";
 import { StripeRoutes } from "../utils/stripe/webhook.route";
 import { PatientRoutes } from "../modules/Patient/patient.route";
+import { AuthRoutes } from "../modules/Auth/auth.route";
 
 const router = Router();
 
@@ -13,6 +14,10 @@ const moduleRoutes = [
   {
     path: "/patient",
     route: PatientRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
   },
 ];
 

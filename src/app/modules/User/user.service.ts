@@ -70,7 +70,3 @@ export const insertIntoDbService = async (payload: IUser) => {
 
 // Get from db single user
 
-export const loginService = async (email: string) => {
-  const result = await User.findOne({ email: email }).select("+password");
-  return result;
-};

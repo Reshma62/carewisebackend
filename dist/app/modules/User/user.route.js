@@ -13,5 +13,4 @@ const _ = (0, express_1.Router)();
 // routes
 // _.post("/register", CreateController);
 _.post("/register", (0, ValidateDataSchema_1.default)(user_schemaValidation_1.createUserZodSchema), user_controller_1.CreateController);
-_.get("/login", user_controller_1.LoginController);
 exports.UserRoutes = _;
