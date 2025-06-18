@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import config from "../../config";
 
 interface UserPayload {
@@ -38,4 +38,8 @@ export const generateToken = (
       expiresIn: expireMap[type],
     }
   );
+};
+
+export const verifyToken = (token: string, secret: Secret) => {
+  return jwt.verify(token, secret) as UserPayload;
 };

@@ -8,9 +8,12 @@ const express_1 = require("express");
 const auth_controller_1 = require("./auth.controller");
 const ValidateDataSchema_1 = __importDefault(require("../../middlewares/ValidateDataSchema"));
 const user_schemaValidation_1 = require("../User/user.schemaValidation");
+const authGuard_1 = require("../../middlewares/authGuard");
+const user_constant_1 = require("../User/user.constant");
 const _ = (0, express_1.Router)();
 // controller
 // routes
+_.get("/me", (0, authGuard_1.auth)(user_constant_1.userRole.DOCTOR, user_constant_1.userRole.PATIENT, user_constant_1.userRole.PATIENT), auth_controller_1.GetMeController);
 _.post("/login", (0, ValidateDataSchema_1.default)(user_schemaValidation_1.loginUserZodSchema), auth_controller_1.LoginController);
 _.post("/token-generate", auth_controller_1.RefreshTokenGenerateController);
 exports.AuthRoutes = _;

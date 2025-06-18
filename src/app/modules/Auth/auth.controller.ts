@@ -1,7 +1,11 @@
 import httpStatus from "http-status";
 import { RequestHandler } from "express";
 import sendResponse from "../../utils/SendResponse";
-import { loginService, refreshTokenService } from "./auth.service";
+import {
+  getMeService,
+  loginService,
+  refreshTokenService,
+} from "./auth.service";
 import config from "../../config";
 
 //? Login in controller
@@ -25,6 +29,23 @@ export const LoginController: RequestHandler = async (req, res, next) => {
         accessToken,
         needPasswordChange,
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//? Get me controller
+export const GetMeController: RequestHandler = async (req, res, next) => {
+  try {
+    const data = req.user;
+
+    const result = await getMeService(data);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: " is created successfully",
+      data: result,
     });
   } catch (err) {
     next(err);
