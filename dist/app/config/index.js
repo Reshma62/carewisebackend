@@ -15,8 +15,13 @@ exports.default = {
     trail_days: parseInt(process.env.TRIAL_DAYS || "15"),
     stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
     local_base_frontend_url: process.env.LOCAL_BASE_URL,
+    live_fronted_url: process.env.LIVE_BASE_URL,
     accessTokenExp: process.env.JWT_EXPIRES_IN_ACCESS_TOKEN,
     refreshTokenExp: process.env.JWT_EXPIRES_IN_RE_TOKEN,
     accessTokenSecret: process.env.JWT_SECRETS_ACCESS_TOKEN,
     refreshTokenSecret: process.env.JWT_SECRETS_RE_TOKEN,
+    node_mailer_email: process.env.EMAIL,
+    node_mailer_pass: process.env.PASS,
+    forget_pass_secret: process.env.JWT_FORGET_PASS_SECRET,
+    forget_pass_exp: process.env.JWT_FORGET_PASS_EXP,
 };

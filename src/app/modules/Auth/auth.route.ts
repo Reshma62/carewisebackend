@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {
+  ForgotPassController,
   GetMeController,
   LoginController,
   RefreshTokenGenerateController,
+  ResetPasswordController,
 } from "./auth.controller";
 import ValidateDataSchema from "../../middlewares/ValidateDataSchema";
 import { loginUserZodSchema } from "../User/user.schemaValidation";
@@ -19,5 +21,7 @@ _.get(
 _.post("/login", ValidateDataSchema(loginUserZodSchema), LoginController);
 
 _.post("/token-generate", RefreshTokenGenerateController);
+_.post("/forget-password", ForgotPassController);
+_.post("/reset-password", ResetPasswordController);
 
 export const AuthRoutes = _;

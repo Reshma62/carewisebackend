@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RefreshTokenGenerateController = exports.GetMeController = exports.LoginController = void 0;
+exports.RefreshTokenGenerateController = exports.ResetPasswordController = exports.ForgotPassController = exports.GetMeController = exports.LoginController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const SendResponse_1 = __importDefault(require("../../utils/SendResponse"));
 const auth_service_1 = require("./auth.service");
@@ -52,7 +52,7 @@ const GetMeController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         (0, SendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
-            message: " is created successfully",
+            message: "Logged in user get successfully",
             data: result,
         });
     }
@@ -61,6 +61,44 @@ const GetMeController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.GetMeController = GetMeController;
+// Forgot password controller
+const ForgotPassController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = req.body;
+        const result = yield (0, auth_service_1.forgotPasswordService)(data);
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Reset link sent in email",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.ForgotPassController = ForgotPassController;
+// Reset password
+const ResetPasswordController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { newPassword, token } = req.body;
+        const data = {
+            newPassword,
+            token,
+        };
+        const result = yield (0, auth_service_1.resetPasswordService)(data);
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Password reset successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.ResetPasswordController = ResetPasswordController;
 //? access token generate
 const RefreshTokenGenerateController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

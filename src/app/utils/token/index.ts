@@ -9,16 +9,18 @@ interface UserPayload {
   role?: string;
 }
 
-type TokenType = "access" | "refresh";
+type TokenType = "access" | "refresh" | "reset";
 
 const secretMap: Record<TokenType, string> = {
   access: config.accessTokenSecret,
   refresh: config.refreshTokenSecret,
+  reset: config.forget_pass_secret,
 };
 
 const expireMap: Record<TokenType, string> = {
   access: config.accessTokenExp,
   refresh: config.refreshTokenExp,
+  reset: config.forget_pass_exp,
 };
 
 export const generateToken = (

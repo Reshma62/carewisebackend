@@ -2,9 +2,11 @@ import httpStatus from "http-status";
 import { RequestHandler } from "express";
 import sendResponse from "../../utils/SendResponse";
 import {
+  forgotPasswordService,
   getMeService,
   loginService,
   refreshTokenService,
+  resetPasswordService,
 } from "./auth.service";
 import config from "../../config";
 
@@ -44,7 +46,48 @@ export const GetMeController: RequestHandler = async (req, res, next) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: " is created successfully",
+      message: "Logged in user get successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Forgot password controller
+export const ForgotPassController: RequestHandler = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const result = await forgotPasswordService(data);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Reset link sent in email",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Reset password
+export const ResetPasswordController: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const { newPassword, token } = req.body;
+
+    const data = {
+      newPassword,
+      token,
+    };
+    const result = await resetPasswordService(data);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password reset successfully",
       data: result,
     });
   } catch (err) {

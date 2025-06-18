@@ -10,7 +10,15 @@ import Doctor from "../Doctor/doctor.model";
 import { IUser } from "../User/user.interface";
 import Patient from "../Patient/patient.model";
 import moment from "moment";
+import { sendEmail } from "../../utils/emailSend";
+interface ForgotPasswordPayload {
+  email: string;
+}
 
+interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
 //Login
 export const loginService = async (email: string, password: string) => {
   // 1. Find user by email and include password
@@ -167,6 +175,67 @@ export const getMeService = async (payload: JwtPayload) => {
   }
 
   return responseData;
+};
+
+// Forget passwordService
+export const forgotPasswordService = async (payload: ForgotPasswordPayload) => {
+  const user = await User.findOne({ email: payload.email });
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "User with this email does not exist"
+    );
+  }
+  const userData = {
+    id: user?._id.toString(),
+    role: user?.role,
+  };
+  // Generate reset token
+  const resetToken = generateToken(userData, "reset");
+
+  // Create reset URL
+  const baseUrl =
+    process.env.NODE_ENV === "production"
+      ? config.live_fronted_url
+      : config.local_base_frontend_url;
+  const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+
+  // Send email
+  const emailResult = await sendEmail({
+    to: user?.email as string,
+    subject: "Password Reset Request",
+    html: `
+      <p>You requested a password reset.</p>
+      <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+      <p>This link will expire in 1 hour.</p>
+    `,
+  });
+
+  return emailResult;
+};
+
+// Reset password service
+export const resetPasswordService = async (payload: ResetPasswordPayload) => {
+  try {
+    // Verify token
+    const decoded = verifyToken(payload.token, config.forget_pass_secret);
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    // Update password
+    user.password = payload.newPassword;
+    await user.save();
+
+    return { success: true };
+  } catch (error) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Invalid or expired reset token"
+    );
+  }
 };
 
 // Refresh token

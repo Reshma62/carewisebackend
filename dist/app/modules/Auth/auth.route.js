@@ -16,4 +16,6 @@ const _ = (0, express_1.Router)();
 _.get("/me", (0, authGuard_1.auth)(user_constant_1.userRole.DOCTOR, user_constant_1.userRole.PATIENT, user_constant_1.userRole.PATIENT), auth_controller_1.GetMeController);
 _.post("/login", (0, ValidateDataSchema_1.default)(user_schemaValidation_1.loginUserZodSchema), auth_controller_1.LoginController);
 _.post("/token-generate", auth_controller_1.RefreshTokenGenerateController);
+_.post("/forget-password", auth_controller_1.ForgotPassController);
+_.post("/reset-password", auth_controller_1.ResetPasswordController);
 exports.AuthRoutes = _;

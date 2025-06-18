@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenService = exports.getMeService = exports.loginService = void 0;
+exports.refreshTokenService = exports.resetPasswordService = exports.forgotPasswordService = exports.getMeService = exports.loginService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const user_model_1 = __importDefault(require("../User/user.model"));
@@ -22,6 +22,7 @@ const config_1 = __importDefault(require("../../config"));
 const doctor_model_1 = __importDefault(require("../Doctor/doctor.model"));
 const patient_model_1 = __importDefault(require("../Patient/patient.model"));
 const moment_1 = __importDefault(require("moment"));
+const emailSend_1 = require("../../utils/emailSend");
 //Login
 const loginService = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     // 1. Find user by email and include password
@@ -141,6 +142,55 @@ const getMeService = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     return responseData;
 });
 exports.getMeService = getMeService;
+// Forget passwordService
+const forgotPasswordService = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.default.findOne({ email: payload.email });
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User with this email does not exist");
+    }
+    const userData = {
+        id: user === null || user === void 0 ? void 0 : user._id.toString(),
+        role: user === null || user === void 0 ? void 0 : user.role,
+    };
+    // Generate reset token
+    const resetToken = (0, token_1.generateToken)(userData, "reset");
+    // Create reset URL
+    const baseUrl = process.env.NODE_ENV === "production"
+        ? config_1.default.live_fronted_url
+        : config_1.default.local_base_frontend_url;
+    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+    // Send email
+    const emailResult = yield (0, emailSend_1.sendEmail)({
+        to: user === null || user === void 0 ? void 0 : user.email,
+        subject: "Password Reset Request",
+        html: `
+      <p>You requested a password reset.</p>
+      <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+      <p>This link will expire in 1 hour.</p>
+    `,
+    });
+    return emailResult;
+});
+exports.forgotPasswordService = forgotPasswordService;
+// Reset password service
+const resetPasswordService = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Verify token
+        const decoded = (0, token_1.verifyToken)(payload.token, config_1.default.forget_pass_secret);
+        const user = yield user_model_1.default.findById(decoded.id);
+        if (!user) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+        }
+        // Update password
+        user.password = payload.newPassword;
+        yield user.save();
+        return { success: true };
+    }
+    catch (error) {
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Invalid or expired reset token");
+    }
+});
+exports.resetPasswordService = resetPasswordService;
 // Refresh token
 const refreshTokenService = (token) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -10,10 +10,12 @@ const config_1 = __importDefault(require("../../config"));
 const secretMap = {
     access: config_1.default.accessTokenSecret,
     refresh: config_1.default.refreshTokenSecret,
+    reset: config_1.default.forget_pass_secret,
 };
 const expireMap = {
     access: config_1.default.accessTokenExp,
     refresh: config_1.default.refreshTokenExp,
+    reset: config_1.default.forget_pass_exp,
 };
 const generateToken = (user, type = "access") => {
     // console.log(user);
