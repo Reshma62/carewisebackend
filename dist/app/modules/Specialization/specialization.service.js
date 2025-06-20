@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.softDeleteService = exports.updateDbService = exports.insertIntoDbService = void 0;
+exports.getAllSpecializations = exports.getSpecializationById = exports.softDeleteService = exports.updateDbService = exports.insertIntoDbService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../errors/AppError"));
 const specialization_model_1 = __importDefault(require("./specialization.model"));
@@ -70,3 +70,19 @@ const softDeleteService = (id) => __awaiter(void 0, void 0, void 0, function* ()
     return specialization;
 });
 exports.softDeleteService = softDeleteService;
+const getSpecializationById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const specialization = yield specialization_model_1.default.findOne({
+        _id: id,
+        isDeleted: false,
+    });
+    if (!specialization) {
+        throw new Error("Specialization not found or deleted");
+    }
+    return specialization;
+});
+exports.getSpecializationById = getSpecializationById;
+const getAllSpecializations = () => __awaiter(void 0, void 0, void 0, function* () {
+    const specializations = yield specialization_model_1.default.find({ isDeleted: false });
+    return specializations;
+});
+exports.getAllSpecializations = getAllSpecializations;

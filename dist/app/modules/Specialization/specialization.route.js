@@ -10,6 +10,8 @@ const ValidateDataSchema_1 = __importDefault(require("../../middlewares/Validate
 const specialization_schemaValidation_1 = require("./specialization.schemaValidation");
 const _ = (0, express_1.Router)();
 // routes
+_.get("/", specialization_controller_1.GetAllSpecializationsController);
+_.get("/:id", specialization_controller_1.GetSpecializationByIdController);
 _.post("/create-specialization", (0, ValidateDataSchema_1.default)(specialization_schemaValidation_1.specializationCreateSchema), specialization_controller_1.InsertIntoDbController);
 _.patch("/update-specialization/:id", (0, ValidateDataSchema_1.default)(specialization_schemaValidation_1.specializationUpdateSchema), specialization_controller_1.UpdateSpecializationController);
 _.delete("/delete-specialization/:id", specialization_controller_1.SoftDeletedController);

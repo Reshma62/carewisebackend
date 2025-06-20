@@ -71,3 +71,19 @@ export const softDeleteService = async (id: string) => {
 
   return specialization;
 };
+export const getSpecializationById = async (id: string) => {
+  const specialization = await Specialization.findOne({
+    _id: id,
+    isDeleted: false,
+  });
+
+  if (!specialization) {
+    throw new Error("Specialization not found or deleted");
+  }
+
+  return specialization;
+};
+export const getAllSpecializations = async () => {
+  const specializations = await Specialization.find({ isDeleted: false });
+  return specializations;
+};  

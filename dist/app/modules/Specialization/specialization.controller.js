@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SoftDeletedController = exports.UpdateSpecializationController = exports.InsertIntoDbController = void 0;
+exports.GetAllSpecializationsController = exports.GetSpecializationByIdController = exports.SoftDeletedController = exports.UpdateSpecializationController = exports.InsertIntoDbController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const SendResponse_1 = __importDefault(require("../../utils/SendResponse"));
 const specialization_service_1 = require("./specialization.service");
@@ -56,7 +56,7 @@ const SoftDeletedController = (req, res, next) => __awaiter(void 0, void 0, void
         (0, SendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
-            message: " is created successfully",
+            message: " Specialization deleted successfully",
             data: result,
         });
     }
@@ -65,3 +65,35 @@ const SoftDeletedController = (req, res, next) => __awaiter(void 0, void 0, void
     }
 });
 exports.SoftDeletedController = SoftDeletedController;
+const GetSpecializationByIdController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield (0, specialization_service_1.getSpecializationById)(id);
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Specialization retrieved successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.GetSpecializationByIdController = GetSpecializationByIdController;
+const GetAllSpecializationsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Assuming you have a service to get all specializations
+        const result = yield (0, specialization_service_1.getAllSpecializations)();
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "All specializations retrieved successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.GetAllSpecializationsController = GetAllSpecializationsController;

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  GetAllSpecializationsController,
+  GetSpecializationByIdController,
   InsertIntoDbController,
   SoftDeletedController,
   UpdateSpecializationController,
@@ -12,6 +14,9 @@ import {
 const _ = Router();
 
 // routes
+
+_.get("/", GetAllSpecializationsController);
+_.get("/:id", GetSpecializationByIdController);
 _.post(
   "/create-specialization",
   ValidateDataSchema(specializationCreateSchema),

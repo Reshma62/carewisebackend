@@ -2,6 +2,8 @@ import httpStatus from "http-status";
 import { RequestHandler } from "express";
 import sendResponse from "../../utils/SendResponse";
 import {
+  getAllSpecializations,
+  getSpecializationById,
   insertIntoDbService,
   softDeleteService,
   updateDbService,
@@ -52,7 +54,45 @@ export const SoftDeletedController: RequestHandler = async (req, res, next) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: " is created successfully",
+      message: " Specialization deleted successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const GetSpecializationByIdController: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const { id } = req.params;
+    const result = await getSpecializationById(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Specialization retrieved successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const GetAllSpecializationsController: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    // Assuming you have a service to get all specializations
+    const result = await getAllSpecializations();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "All specializations retrieved successfully",
       data: result,
     });
   } catch (err) {
