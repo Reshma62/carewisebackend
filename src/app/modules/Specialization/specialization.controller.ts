@@ -87,8 +87,8 @@ export const GetAllSpecializationsController: RequestHandler = async (
   next
 ) => {
   try {
-    // Assuming you have a service to get all specializations
-    const result = await getAllSpecializations();
+    const q = req.query; // Assuming query parameters are passed in the request
+    const result = await getAllSpecializations(q);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

@@ -16,6 +16,7 @@ exports.getAllSpecializations = exports.getSpecializationById = exports.softDele
 const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../errors/AppError"));
 const specialization_model_1 = __importDefault(require("./specialization.model"));
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const existing = yield specialization_model_1.default.findOne({ name: payload.name });
     if (existing) {
@@ -81,8 +82,18 @@ const getSpecializationById = (id) => __awaiter(void 0, void 0, void 0, function
     return specialization;
 });
 exports.getSpecializationById = getSpecializationById;
-const getAllSpecializations = () => __awaiter(void 0, void 0, void 0, function* () {
-    const specializations = yield specialization_model_1.default.find({ isDeleted: false });
-    return specializations;
+const getAllSpecializations = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const queryBuilder = new QueryBuilder_1.default(specialization_model_1.default.find(), query)
+        .search(["name"])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    const specializations = yield queryBuilder.model;
+    const meta = yield queryBuilder.countTotal();
+    return {
+        specializations,
+        meta,
+    };
 });
 exports.getAllSpecializations = getAllSpecializations;

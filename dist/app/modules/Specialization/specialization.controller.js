@@ -83,8 +83,8 @@ const GetSpecializationByIdController = (req, res, next) => __awaiter(void 0, vo
 exports.GetSpecializationByIdController = GetSpecializationByIdController;
 const GetAllSpecializationsController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Assuming you have a service to get all specializations
-        const result = yield (0, specialization_service_1.getAllSpecializations)();
+        const q = req.query; // Assuming query parameters are passed in the request
+        const result = yield (0, specialization_service_1.getAllSpecializations)(q);
         (0, SendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,

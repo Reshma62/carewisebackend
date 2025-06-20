@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import AppError from "../errors/AppError";
 import { ISpecializationInput } from "./specialization.interface";
 import Specialization from "./specialization.model";
+import QueryBuilder from "../../builder/QueryBuilder";
 export const insertIntoDbService = async (payload: ISpecializationInput) => {
   const existing = await Specialization.findOne({ name: payload.name });
 
@@ -83,7 +84,20 @@ export const getSpecializationById = async (id: string) => {
 
   return specialization;
 };
-export const getAllSpecializations = async () => {
-  const specializations = await Specialization.find({ isDeleted: false });
-  return specializations;
-};  
+export const getAllSpecializations = async (query: Record<string, unknown>) => {
+  const queryBuilder = new QueryBuilder(Specialization.find(), query)
+    .search(["name"])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const specializations = await queryBuilder.model;
+  const meta = await queryBuilder.countTotal();
+
+  return {
+    specializations,
+    meta,
+  };
+};
+
