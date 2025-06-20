@@ -69,4 +69,4 @@ const insertIntoDbService = (payload) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.insertIntoDbService = insertIntoDbService;
-// Get from db single user
+// Update user profile 

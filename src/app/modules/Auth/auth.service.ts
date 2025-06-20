@@ -11,6 +11,7 @@ import { IUser } from "../User/user.interface";
 import Patient from "../Patient/patient.model";
 import moment from "moment";
 import { sendEmail } from "../../utils/emailSend";
+import { IProfileUpdate } from "./auth.interface";
 interface ForgotPasswordPayload {
   email: string;
 }
@@ -176,6 +177,33 @@ export const getMeService = async (payload: JwtPayload) => {
 
   return responseData;
 };
+
+// Update user profile
+
+export const updateUserProfileService = async (
+  user: JwtPayload,
+  payload: IProfileUpdate
+) => {
+  // console.log(payload);
+  let updatedUser = null;
+  if (user?.role === "DOCTOR") {
+    updatedUser = await Doctor.findOneAndUpdate({ user: user.id }, payload, {
+      new: true,
+      runValidators: true,
+    }).populate("user", "email role");
+  } else if (user?.role === "PATIENT") {
+    updatedUser = await Patient.findOneAndUpdate({ user: user.id }, payload, {
+      new: true,
+      runValidators: true,
+    }).populate("user", "email role");
+  } else {
+    //TODO: HERES THE ADMIN UPDATE LOGIC
+  }
+  return updatedUser;
+};
+
+
+
 
 // Forget passwordService
 export const forgotPasswordService = async (payload: ForgotPasswordPayload) => {

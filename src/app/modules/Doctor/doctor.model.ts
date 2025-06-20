@@ -68,6 +68,7 @@ const dataSchema = new Schema(
     stripeCustomerId: {
       type: String,
     },
+
     subscription: {
       status: {
         type: String,

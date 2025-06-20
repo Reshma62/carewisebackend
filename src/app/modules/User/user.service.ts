@@ -68,5 +68,7 @@ export const insertIntoDbService = async (payload: IUser) => {
   }
 };
 
-// Get from db single user
+// Update user profile 
+
+
 

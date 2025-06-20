@@ -7,6 +7,7 @@ import {
   loginService,
   refreshTokenService,
   resetPasswordService,
+  updateUserProfileService,
 } from "./auth.service";
 import config from "../../config";
 
@@ -40,9 +41,9 @@ export const LoginController: RequestHandler = async (req, res, next) => {
 //? Get me controller
 export const GetMeController: RequestHandler = async (req, res, next) => {
   try {
-    const data = req.user;
+    const user = req.user;
 
-    const result = await getMeService(data);
+    const result = await getMeService(user);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -53,7 +54,27 @@ export const GetMeController: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+//?   Update user profile controller
+export const UpdateUserProfileController: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const user = req.user;
+    const data = req.body;
 
+    const result = await updateUserProfileService(user, data);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Profile updated successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 // Forgot password controller
 export const ForgotPassController: RequestHandler = async (req, res, next) => {
   try {

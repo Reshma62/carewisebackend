@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RefreshTokenGenerateController = exports.ResetPasswordController = exports.ForgotPassController = exports.GetMeController = exports.LoginController = void 0;
+exports.RefreshTokenGenerateController = exports.ResetPasswordController = exports.ForgotPassController = exports.UpdateUserProfileController = exports.GetMeController = exports.LoginController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const SendResponse_1 = __importDefault(require("../../utils/SendResponse"));
 const auth_service_1 = require("./auth.service");
@@ -47,8 +47,8 @@ exports.LoginController = LoginController;
 //? Get me controller
 const GetMeController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = req.user;
-        const result = yield (0, auth_service_1.getMeService)(data);
+        const user = req.user;
+        const result = yield (0, auth_service_1.getMeService)(user);
         (0, SendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
@@ -61,6 +61,24 @@ const GetMeController = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.GetMeController = GetMeController;
+//?   Update user profile controller
+const UpdateUserProfileController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        const data = req.body;
+        const result = yield (0, auth_service_1.updateUserProfileService)(user, data);
+        (0, SendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: "Profile updated successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.UpdateUserProfileController = UpdateUserProfileController;
 // Forgot password controller
 const ForgotPassController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

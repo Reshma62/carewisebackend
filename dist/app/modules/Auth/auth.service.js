@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenService = exports.resetPasswordService = exports.forgotPasswordService = exports.getMeService = exports.loginService = void 0;
+exports.refreshTokenService = exports.resetPasswordService = exports.forgotPasswordService = exports.updateUserProfileService = exports.getMeService = exports.loginService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const http_status_1 = __importDefault(require("http-status"));
 const user_model_1 = __importDefault(require("../User/user.model"));
@@ -142,6 +142,28 @@ const getMeService = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     return responseData;
 });
 exports.getMeService = getMeService;
+// Update user profile
+const updateUserProfileService = (user, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    // console.log(payload);
+    let updatedUser = null;
+    if ((user === null || user === void 0 ? void 0 : user.role) === "DOCTOR") {
+        updatedUser = yield doctor_model_1.default.findOneAndUpdate({ user: user.id }, payload, {
+            new: true,
+            runValidators: true,
+        }).populate("user", "email role");
+    }
+    else if ((user === null || user === void 0 ? void 0 : user.role) === "PATIENT") {
+        updatedUser = yield patient_model_1.default.findOneAndUpdate({ user: user.id }, payload, {
+            new: true,
+            runValidators: true,
+        }).populate("user", "email role");
+    }
+    else {
+        //TODO: HERES THE ADMIN UPDATE LOGIC
+    }
+    return updatedUser;
+});
+exports.updateUserProfileService = updateUserProfileService;
 // Forget passwordService
 const forgotPasswordService = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.default.findOne({ email: payload.email });

@@ -3,6 +3,7 @@ import { UserRoutes } from "../modules/User/user.route";
 import { StripeRoutes } from "../utils/stripe/webhook.route";
 import { PatientRoutes } from "../modules/Patient/patient.route";
 import { AuthRoutes } from "../modules/Auth/auth.route";
+import { SpecializationRoutes } from "../modules/Specialization/specialization.route";
 
 const router = Router();
 
@@ -18,6 +19,10 @@ const moduleRoutes = [
   {
     path: "/auth",
     route: AuthRoutes,
+  },
+  {
+    path: "/specialization",
+    route: SpecializationRoutes,
   },
 ];
 
