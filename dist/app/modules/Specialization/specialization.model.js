@@ -4,6 +4,8 @@ const mongoose_1 = require("mongoose");
 const dataSchema = new mongoose_1.Schema({
     name: {
         type: String,
+        required: true,
+        unique: true,
     },
     image: {
         type: String, // URL to the specialization image
@@ -11,6 +13,10 @@ const dataSchema = new mongoose_1.Schema({
     doctor: {
         type: [mongoose_1.Schema.Types.ObjectId], // Reference to the doctor
         ref: "Doctor",
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false, // Flag to mark if the specialization is deleted
     },
 }, { timestamps: true } // Automatically add createdAt and updatedAt
 );
